@@ -9,7 +9,7 @@ import java.io.File;
 public class ElixirclientGenerator extends DefaultCodegen implements CodegenConfig {
 
   // source folder where to write the files
-  protected String sourceFolder = "src";
+  protected String sourceFolder = "lib";
   protected String apiVersion = "1.0.0";
 
   /**
