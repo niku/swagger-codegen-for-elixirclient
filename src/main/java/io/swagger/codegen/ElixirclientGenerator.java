@@ -74,11 +74,6 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     templateDir = "ElixirClient";
 
     /**
-     * Api Package.  Optional, if needed, this can be used in templates
-     */
-    apiPackage = "io.swagger.client.api";
-
-    /**
      * Model Package.  Optional, if needed, this can be used in templates
      */
     modelPackage = "io.swagger.client.model";
