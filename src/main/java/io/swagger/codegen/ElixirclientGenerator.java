@@ -107,6 +107,10 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
       "",                                                       // the destination folder, relative `outputFolder`
       "README.md")                                          // the output file
     );
+    supportingFiles.add(new SupportingFile("config.exs.mustache",
+      "config",
+      "config.exs")
+    );
 
     /**
      * Language Specific Primitives.  These types will not trigger imports by
