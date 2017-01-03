@@ -115,6 +115,10 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
       "",
       "mix.exs")
     );
+    supportingFiles.add(new SupportingFile("test_helper.exs.mustache",
+      "test",
+      "test_helper.exs")
+    );
 
     /**
      * Language Specific Primitives.  These types will not trigger imports by
