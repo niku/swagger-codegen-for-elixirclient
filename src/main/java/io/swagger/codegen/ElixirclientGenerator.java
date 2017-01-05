@@ -9,7 +9,7 @@ import java.io.File;
 public class ElixirclientGenerator extends DefaultCodegen implements CodegenConfig {
 
   // source folder where to write the files
-  protected String sourceFolder = "src";
+  protected String sourceFolder = "lib";
   protected String apiVersion = "1.0.0";
 
   /**
@@ -56,7 +56,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
      */
     modelTemplateFiles.put(
       "model.mustache", // the template to use
-      ".sample");       // the extension for each file to write
+      ".ex");       // the extension for each file to write
 
     /**
      * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
@@ -65,23 +65,13 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
      */
     apiTemplateFiles.put(
       "api.mustache",   // the template to use
-      ".sample");       // the extension for each file to write
+      ".ex");       // the extension for each file to write
 
     /**
      * Template Location.  This is the location which templates will be read from.  The generator
      * will use the resource stream to attempt to read the templates.
      */
     templateDir = "ElixirClient";
-
-    /**
-     * Api Package.  Optional, if needed, this can be used in templates
-     */
-    apiPackage = "io.swagger.client.api";
-
-    /**
-     * Model Package.  Optional, if needed, this can be used in templates
-     */
-    modelPackage = "io.swagger.client.model";
 
     /**
      * Reserved words.  Override this with reserved words specific to your language
@@ -103,9 +93,21 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
      * entire object tree available.  If the input file has a suffix of `.mustache
      * it will be processed by the template engine.  Otherwise, it will be copied
      */
-    supportingFiles.add(new SupportingFile("myFile.mustache",   // the input template or file
+    supportingFiles.add(new SupportingFile("README.md.mustache",   // the input template or file
       "",                                                       // the destination folder, relative `outputFolder`
-      "myFile.sample")                                          // the output file
+      "README.md")                                          // the output file
+    );
+    supportingFiles.add(new SupportingFile("config.exs.mustache",
+      "config",
+      "config.exs")
+    );
+    supportingFiles.add(new SupportingFile("mix.exs.mustache",
+      "",
+      "mix.exs")
+    );
+    supportingFiles.add(new SupportingFile("test_helper.exs.mustache",
+      "test",
+      "test_helper.exs")
     );
 
     /**
@@ -135,7 +137,11 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
+    if(0 < getAppPrefix().length()) {
+      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "model";
+    } else {
+      return outputFolder + "/" + sourceFolder + "/" + "model";
+    }
   }
 
   /**
@@ -144,7 +150,45 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
-    return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    if(0 < getAppPrefix().length()) {
+      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "api";
+    } else {
+      return outputFolder + "/" + sourceFolder + "/" + "api";
+    }
+  }
+
+  String getAppPrefix() {
+    Object appName = additionalProperties.get("appName");
+    if(appName == null) {
+      appName = "";
+    }
+
+    // In most cases, appName represents the title of the schema as String.
+    assert appName instanceof String;
+
+    ArrayList<String> words = new ArrayList<String>();
+    for (String word : ((String) appName).split(" ")) {
+      words.add(snakeCase(word));
+    }
+    return String.join("_", words);
+  }
+
+  @Override
+  public String toApiName(String name) {
+    if (name.length() == 0) {
+      return "Default";
+    }
+    return initialCaps(name);
+  }
+
+  @Override
+  public String toApiFilename(String name) {
+    return snakeCase(name);
+  }
+
+  @Override
+  public String toModelFilename(String name) {
+    return snakeCase(name);
   }
 
   /**
