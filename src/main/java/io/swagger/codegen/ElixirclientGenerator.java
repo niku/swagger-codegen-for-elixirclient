@@ -137,7 +137,11 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    return outputFolder + "/" + sourceFolder + "/" + getAppPrefix();
+    if(0 < getAppPrefix().length()) {
+      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "model";
+    } else {
+      return outputFolder + "/" + sourceFolder + "/" + "model";
+    }
   }
 
   /**
