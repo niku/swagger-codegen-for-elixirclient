@@ -74,11 +74,6 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     templateDir = "ElixirClient";
 
     /**
-     * Model Package.  Optional, if needed, this can be used in templates
-     */
-    modelPackage = "io.swagger.client.model";
-
-    /**
      * Reserved words.  Override this with reserved words specific to your language
      */
     reservedWords = new HashSet<String> (
