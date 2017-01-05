@@ -137,19 +137,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    Object appName = additionalProperties.get("appName");
-    if(appName == null) {
-      appName = "";
-    }
-
-    // In most cases, appName represents the title of the schema as String.
-    assert appName instanceof String;
-
-    ArrayList<String> words = new ArrayList<String>();
-    for (String word : ((String) appName).split(" ")) {
-      words.add(snakeCase(word));
-    }
-    String modelPrefix = String.join("_", words);
+    String modelPrefix = getAppPrefix();
     return outputFolder + "/" + sourceFolder + "/" + modelPrefix;
   }
 
@@ -159,6 +147,15 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
+    String apiPrefix = getAppPrefix();
+    if(0 < apiPrefix.length()) {
+      return outputFolder + "/" + sourceFolder + "/" + apiPrefix + "/" + "api";
+    } else {
+      return outputFolder + "/" + sourceFolder + "/" + "api";
+    }
+  }
+
+  String getAppPrefix() {
     Object appName = additionalProperties.get("appName");
     if(appName == null) {
       appName = "";
@@ -171,12 +168,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     for (String word : ((String) appName).split(" ")) {
       words.add(snakeCase(word));
     }
-    String apiPrefix = String.join("_", words);
-    if(0 < apiPrefix.length()) {
-      return outputFolder + "/" + sourceFolder + "/" + apiPrefix + "/" + "api";
-    } else {
-      return outputFolder + "/" + sourceFolder + "/" + "api";
-    }
+    return String.join("_", words);
   }
 
   @Override
