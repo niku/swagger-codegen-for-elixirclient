@@ -137,8 +137,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    String modelPrefix = getAppPrefix();
-    return outputFolder + "/" + sourceFolder + "/" + modelPrefix;
+    return outputFolder + "/" + sourceFolder + "/" + getAppPrefix();
   }
 
   /**
@@ -147,9 +146,8 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
-    String apiPrefix = getAppPrefix();
-    if(0 < apiPrefix.length()) {
-      return outputFolder + "/" + sourceFolder + "/" + apiPrefix + "/" + "api";
+    if(0 < getAppPrefix().length()) {
+      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "api";
     } else {
       return outputFolder + "/" + sourceFolder + "/" + "api";
     }
