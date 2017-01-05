@@ -1,12 +1,19 @@
 package io.swagger.codegen;
 
 import io.swagger.codegen.*;
+import io.swagger.models.Info;
+import io.swagger.models.Swagger;
 import io.swagger.models.properties.*;
 
 import java.util.*;
 import java.io.File;
 
 public class ElixirclientGenerator extends DefaultCodegen implements CodegenConfig {
+  class ElixirclientGeneratorCannotHandleException extends RuntimeException {
+    public ElixirclientGeneratorCannotHandleException(String message) {
+      super();
+    }
+  };
 
   // source folder where to write the files
   protected String sourceFolder = "lib";
@@ -119,6 +126,28 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
         "Type1",      // replace these with your types
         "Type2")
     );
+  }
+
+  @Override
+  public void preprocessSwagger(Swagger swagger) {
+    super.preprocessSwagger(swagger);
+
+    Info info = swagger.getInfo();
+    if (info == null) {
+      throw new ElixirclientGeneratorCannotHandleException("ElixirclientGenerator assumes the schema has 'info' object right now.");
+    }
+
+    String title = info.getTitle();
+    if (title == null) {
+      throw new ElixirclientGeneratorCannotHandleException("ElixirclientGenerator assumes the 'info' object has 'title' right now.");
+    }
+
+    ArrayList<String> words = new ArrayList<String>();
+    for (String word : escapeText(title).split(" ")) {
+      words.add(underscore(word));
+    }
+    String underscoredAppName = String.join("_", words);
+    additionalProperties.put("underscoredAppName", underscoredAppName);
   }
 
   /**
