@@ -179,6 +179,11 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     return initialCaps(name);
   }
 
+  @Override
+  public String toApiFilename(String name) {
+    return snakeCase(name);
+  }
+
   /**
    * Optional - type declaration.  This is a String which is used by the templates to instantiate your
    * types.  There is typically special handling for different property types
