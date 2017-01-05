@@ -151,7 +151,20 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
-    return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    Object appName = additionalProperties.get("appName");
+    if(appName == null) {
+      appName = "";
+    }
+
+    // In most cases, appName represents the title of the schema as String.
+    assert appName instanceof String;
+
+    ArrayList<String> words = new ArrayList<String>();
+    for (String word : ((String) appName).split(" ")) {
+      words.add(snakeCase(word));
+    }
+    String apiPrefix = String.join("_", words);
+    return outputFolder + "/" + sourceFolder + "/" + apiPrefix
   }
 
   /**
