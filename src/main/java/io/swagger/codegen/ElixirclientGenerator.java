@@ -65,7 +65,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
      */
     apiTemplateFiles.put(
       "api.mustache",   // the template to use
-      ".sample");       // the extension for each file to write
+      ".ex");       // the extension for each file to write
 
     /**
      * Template Location.  This is the location which templates will be read from.  The generator
