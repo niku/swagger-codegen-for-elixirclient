@@ -164,7 +164,11 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
       words.add(snakeCase(word));
     }
     String apiPrefix = String.join("_", words);
-    return outputFolder + "/" + sourceFolder + "/" + apiPrefix
+    if(0 < apiPrefix.length()) {
+      return outputFolder + "/" + sourceFolder + "/" + apiPrefix + "/" + "api";
+    } else {
+      return outputFolder + "/" + sourceFolder + "/" + "api";
+    }
   }
 
   /**
