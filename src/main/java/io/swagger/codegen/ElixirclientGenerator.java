@@ -19,6 +19,9 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
   protected String sourceFolder = "lib";
   protected String apiVersion = "1.0.0";
 
+  String supportedElixirVersion = "1.4";
+  List<String> extraApplications = Arrays.asList(":logger");
+
   /**
    * Configures the type of generator.
    * 
@@ -129,6 +132,13 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
   }
 
   @Override
+  public void processOpts() {
+    super.processOpts();
+    additionalProperties.put("supportedElixirVersion", supportedElixirVersion);
+    additionalProperties.put("extraApplications", String.join(",", extraApplications));
+  }
+
+  @Override
   public void preprocessSwagger(Swagger swagger) {
     super.preprocessSwagger(swagger);
 
@@ -142,12 +152,16 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
       throw new ElixirclientGeneratorCannotHandleException("ElixirclientGenerator assumes the 'info' object has 'title' right now.");
     }
 
-    ArrayList<String> words = new ArrayList<String>();
+    ArrayList<String> underScoredWords = new ArrayList<String>();
+    ArrayList<String> camelizedWords = new ArrayList<String>();
     for (String word : escapeText(title).split(" ")) {
-      words.add(underscore(word));
+      underScoredWords.add(underscore(word));
+      camelizedWords.add(camelize(word));
     }
-    String underscoredAppName = String.join("_", words);
+    String underscoredAppName = String.join("_", underScoredWords);
+    String camelizedAppName = String.join("", camelizedWords);
     additionalProperties.put("underscoredAppName", underscoredAppName);
+    additionalProperties.put("camelizedAppName", camelizedAppName);
   }
 
   /**
