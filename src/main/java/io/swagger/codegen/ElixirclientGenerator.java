@@ -166,11 +166,9 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    if(0 < getAppPrefix().length()) {
-      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "model";
-    } else {
-      return outputFolder + "/" + sourceFolder + "/" + "model";
-    }
+    // We have already checked the value of "underscoredAppName" is given and instance of String in the preprocessSwagger method.
+    String underscoredAppName = (String) additionalProperties.get("underscoredAppName");
+    return outputFolder + "/" + sourceFolder + "/" + underscoredAppName + "/" + "model";
   }
 
   /**
@@ -179,27 +177,9 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
-    if(0 < getAppPrefix().length()) {
-      return outputFolder + "/" + sourceFolder + "/" + getAppPrefix() + "/" + "api";
-    } else {
-      return outputFolder + "/" + sourceFolder + "/" + "api";
-    }
-  }
-
-  String getAppPrefix() {
-    Object appName = additionalProperties.get("appName");
-    if(appName == null) {
-      appName = "";
-    }
-
-    // In most cases, appName represents the title of the schema as String.
-    assert appName instanceof String;
-
-    ArrayList<String> words = new ArrayList<String>();
-    for (String word : ((String) appName).split(" ")) {
-      words.add(snakeCase(word));
-    }
-    return String.join("_", words);
+    // We have already checked the value of "underscoredAppName" is given and instance of String in the preprocessSwagger method.
+    String underscoredAppName = (String) additionalProperties.get("underscoredAppName");
+    return outputFolder + "/" + sourceFolder + "/" + underscoredAppName + "/" + "api";
   }
 
   @Override
