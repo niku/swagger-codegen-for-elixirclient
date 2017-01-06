@@ -1,12 +1,17 @@
 package io.swagger.codegen;
 
-import io.swagger.codegen.*;
-import io.swagger.models.Info;
-import io.swagger.models.Swagger;
-import io.swagger.models.properties.*;
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.MapProperty;
+import io.swagger.models.properties.Property;
 
-import java.util.*;
-import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 public class ElixirclientGenerator extends DefaultCodegen implements CodegenConfig {
   class ElixirclientGeneratorCannotHandleException extends RuntimeException {
@@ -136,32 +141,34 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     super.processOpts();
     additionalProperties.put("supportedElixirVersion", supportedElixirVersion);
     additionalProperties.put("extraApplications", String.join(",", extraApplications));
+    additionalProperties.put("underscored", new Mustache.Lambda() {
+      @Override
+      public void execute(Template.Fragment fragment, Writer writer) throws IOException {
+        writer.write(underscored(fragment.execute()));
+      }
+    });
+    additionalProperties.put("modulized", new Mustache.Lambda() {
+      @Override
+      public void execute(Template.Fragment fragment, Writer writer) throws IOException {
+        writer.write(modulized(fragment.execute()));
+      }
+    });
   }
 
-  @Override
-  public void preprocessSwagger(Swagger swagger) {
-    super.preprocessSwagger(swagger);
-
-    Info info = swagger.getInfo();
-    if (info == null) {
-      throw new ElixirclientGeneratorCannotHandleException("ElixirclientGenerator assumes the schema has 'info' object right now.");
+  String underscored(String words) {
+    ArrayList<String> underscoredWords = new ArrayList<String>();
+    for (String word : words.split(" ")) {
+      underscoredWords.add(underscore(word));
     }
+    return String.join("_", underscoredWords);
+  }
 
-    String title = info.getTitle();
-    if (title == null) {
-      throw new ElixirclientGeneratorCannotHandleException("ElixirclientGenerator assumes the 'info' object has 'title' right now.");
+  String modulized(String words) {
+    ArrayList<String> modulizedWords = new ArrayList<String>();
+    for (String word : words.split(" ")) {
+      modulizedWords.add(camelize(word));
     }
-
-    ArrayList<String> underScoredWords = new ArrayList<String>();
-    ArrayList<String> camelizedWords = new ArrayList<String>();
-    for (String word : escapeText(title).split(" ")) {
-      underScoredWords.add(underscore(word));
-      camelizedWords.add(camelize(word));
-    }
-    String underscoredAppName = String.join("_", underScoredWords);
-    String camelizedAppName = String.join("", camelizedWords);
-    additionalProperties.put("underscoredAppName", underscoredAppName);
-    additionalProperties.put("camelizedAppName", camelizedAppName);
+    return String.join("",  modulizedWords);
   }
 
   /**
@@ -180,9 +187,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    * instantiated
    */
   public String modelFileFolder() {
-    // We have already checked the value of "underscoredAppName" is given and instance of String in the preprocessSwagger method.
-    String underscoredAppName = (String) additionalProperties.get("underscoredAppName");
-    return outputFolder + "/" + sourceFolder + "/" + underscoredAppName + "/" + "model";
+    return outputFolder + "/" + sourceFolder + "/" + underscored((String) additionalProperties.get("appName")) + "/" + "model";
   }
 
   /**
@@ -191,9 +196,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
    */
   @Override
   public String apiFileFolder() {
-    // We have already checked the value of "underscoredAppName" is given and instance of String in the preprocessSwagger method.
-    String underscoredAppName = (String) additionalProperties.get("underscoredAppName");
-    return outputFolder + "/" + sourceFolder + "/" + underscoredAppName + "/" + "api";
+    return outputFolder + "/" + sourceFolder + "/" + underscored((String) additionalProperties.get("appName")) + "/" + "api";
   }
 
   @Override

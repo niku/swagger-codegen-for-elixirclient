@@ -1,7 +1,7 @@
-defmodule {{camelizedAppName}}.Mixfile do
+defmodule {{#modulized}}{{appName}}{{/modulized}}.Mixfile do
   use Mix.Project
   def project do
-    [app: :{{underscoredAppName}},
+    [app: :{{#underscored}}{{appName}}{{/underscored}},
      version: "0.1.0",
      elixir: "~> {{supportedElixirVersion}}",
      build_embedded: Mix.env == :prod,
