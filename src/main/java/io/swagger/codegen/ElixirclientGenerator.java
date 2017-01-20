@@ -26,6 +26,12 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
 
   String supportedElixirVersion = "1.4";
   List<String> extraApplications = Arrays.asList(":logger");
+  List<String> deps = Arrays.asList(
+    "{:tesla, \"~> 0.5.0\"}",
+    "{:poison, \">= 1.0.0\"}"
+  );
+
+
 
   /**
    * Configures the type of generator.
@@ -141,6 +147,7 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
     super.processOpts();
     additionalProperties.put("supportedElixirVersion", supportedElixirVersion);
     additionalProperties.put("extraApplications", String.join(",", extraApplications));
+    additionalProperties.put("deps", deps);
     additionalProperties.put("underscored", new Mustache.Lambda() {
       @Override
       public void execute(Template.Fragment fragment, Writer writer) throws IOException {

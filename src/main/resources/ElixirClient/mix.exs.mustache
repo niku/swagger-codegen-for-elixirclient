@@ -25,6 +25,10 @@ defmodule {{#modulized}}{{appName}}{{/modulized}}.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+{{#deps}}
+      {{{this}}}{{^-last}},{{/-last}}
+{{/deps}}
+    ]
   end
 end
