@@ -3,15 +3,26 @@ defmodule {{#modulized}}{{appName}}{{/modulized}}.Api.{{classname}} do
   Documentation for {{#modulized}}{{appName}}{{/modulized}}.Api.{{classname}}.
   """
 
-  @doc """
-  Hello world.
+  use Tesla
 
-  ## Examples
-      iex> {{#modulized}}{{appName}}{{/modulized}}.Api.{{classname}}.hello
-      :world
+  plug Tesla.Middleware.BaseUrl, "{{basePath}}"
+  plug Tesla.Middleware.JSON
+{{#operations}}
+    {{#operation}}
 
-  """
-  def hello do
-    :world
+  def {{#underscored}}{{operationId}}{{/underscored}}({{#allParams}}{{^-first}}, {{/-first}}{{#underscored}}{{paramName}}{{/underscored}}{{/allParams}}) do
+    method = [method: :{{#underscored}}{{httpMethod}}{{/underscored}}]
+    url = [url: "{{replacedPathName}}"]
+    query_params = [{{^queryParams.isEmpty}}query: [{{#queryParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/queryParams}}]{{/queryParams.isEmpty}}]
+    header_params = [{{^headerParams.isEmpty}}header: [{{#headerParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/headerParams}}]{{/headerParams.isEmpty}}]
+    body_params = [{{^bodyParams.isEmpty}}body: [{{#bodyParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/bodyParams}}]{{/bodyParams.isEmpty}}]
+    form_params = [{{^formParams.isEmpty}}body: [{{#formParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/formParams}}]{{/formParams.isEmpty}}]
+    params = query_params ++ header_params ++ Keyword.get_values(body_params ++ form_params, :body)
+    opts = []
+    options = method ++ url ++ params ++ opts
+
+    request(options)
   end
+    {{/operation}}
+{{/operations}}
 end

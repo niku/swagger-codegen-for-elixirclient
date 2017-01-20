@@ -8,10 +8,9 @@ import io.swagger.models.properties.Property;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ElixirclientGenerator extends DefaultCodegen implements CodegenConfig {
   class ElixirclientGeneratorCannotHandleException extends RuntimeException {
@@ -160,6 +159,112 @@ public class ElixirclientGenerator extends DefaultCodegen implements CodegenConf
         writer.write(modulized(fragment.execute()));
       }
     });
+  }
+
+  class ExtendedCodegenOperation extends CodegenOperation {
+    private List<String> pathTemplateNames = new ArrayList<String>();
+    private String replacedPathName;
+
+    public ExtendedCodegenOperation(CodegenOperation o) {
+      super();
+
+      // Copy all fields of CodegenOperation
+      this.responseHeaders.addAll(o.responseHeaders);
+      this.hasAuthMethods = o.hasAuthMethods;
+      this.hasConsumes = o.hasConsumes;
+      this.hasProduces = o.hasProduces;
+      this.hasParams = o.hasParams;
+      this.hasOptionalParams = o.hasOptionalParams;
+      this.returnTypeIsPrimitive = o.returnTypeIsPrimitive;
+      this.returnSimpleType = o.returnSimpleType;
+      this.subresourceOperation = o.subresourceOperation;
+      this.isMapContainer = o.isMapContainer;
+      this.isListContainer = o.isListContainer;
+      this.isMultipart = o.isMultipart;
+      this.hasMore = o.hasMore;
+      this.isResponseBinary = o.isResponseBinary;
+      this.hasReference = o.hasReference;
+      this.isRestfulIndex = o.isRestfulIndex;
+      this.isRestfulShow = o.isRestfulShow;
+      this.isRestfulCreate = o.isRestfulCreate;
+      this.isRestfulUpdate = o.isRestfulUpdate;
+      this.isRestfulDestroy = o.isRestfulDestroy;
+      this.isRestful = o.isRestful;
+      this.path = o.path;
+      this.operationId = o.operationId;
+      this.returnType = o.returnType;
+      this.httpMethod = o.httpMethod;
+      this.returnBaseType = o.returnBaseType;
+      this.returnContainer = o.returnContainer;
+      this.summary = o.summary;
+      this.unescapedNotes = o.unescapedNotes;
+      this.notes = o.notes;
+      this.baseName = o.baseName;
+      this.defaultResponse = o.defaultResponse;
+      this.discriminator = o.discriminator;
+      this.consumes = o.consumes;
+      this.produces = o.produces;
+      this.bodyParam = o.bodyParam;
+      this.allParams = o.allParams;
+      this.bodyParams = o.bodyParams;
+      this.pathParams = o.pathParams;
+      this.queryParams = o.queryParams;
+      this.headerParams = o.headerParams;
+      this.formParams = o.formParams;
+      this.authMethods = o.authMethods;
+      this.tags = o.tags;
+      this.responses = o.responses;
+      this.imports = o.imports;
+      this.examples = o.examples;
+      this.externalDocs = o.externalDocs;
+      this.vendorExtensions = o.vendorExtensions;
+      this.nickname = o.nickname;
+      this.operationIdLowerCase = o.operationIdLowerCase;
+    }
+
+    public List<String> getPathTemplateNames() {
+      return pathTemplateNames;
+    }
+
+    public void setPathTemplateNames(List<String> pathTemplateNames) {
+      this.pathTemplateNames = pathTemplateNames;
+    }
+
+    public String getReplacedPathName() {
+      return replacedPathName;
+    }
+
+    public void setReplacedPathName(String replacedPathName) {
+      this.replacedPathName = replacedPathName;
+    }
+  };
+
+  @Override
+  public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
+    Map<String, Object> operations = (Map<String, Object>) super.postProcessOperations(objs).get("operations");
+    List<CodegenOperation> os = (List<CodegenOperation>) operations.get("operation");
+    List<ExtendedCodegenOperation> newOs = new ArrayList<ExtendedCodegenOperation>();
+    Pattern pattern = Pattern.compile("(.*)\\{([^\\}]+)\\}(.*)");
+    for (CodegenOperation o : os) {
+      ArrayList<String> pathTemplateNames = new ArrayList<String>();
+      Matcher matcher = pattern.matcher(o.path);
+      StringBuffer buffer = new StringBuffer();
+      while(matcher.find()) {
+        String pathTemplateName = matcher.group(2);
+        matcher.appendReplacement(buffer, "$1" + "#{" + underscore(pathTemplateName) + "}" + "$3");
+        pathTemplateNames.add(pathTemplateName);
+      }
+      ExtendedCodegenOperation eco = new ExtendedCodegenOperation(o);
+      if(buffer.toString().isEmpty()) {
+        eco.setReplacedPathName(o.path);
+      } else {
+        eco.setReplacedPathName(buffer.toString());
+      }
+      eco.setPathTemplateNames(pathTemplateNames);
+      newOs.add(eco);
+    }
+    operations.put("operation", newOs);
+    return objs;
   }
 
   String underscored(String words) {
