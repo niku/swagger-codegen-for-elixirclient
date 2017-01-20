@@ -1,28 +1,28 @@
+defmodule {{#modulized}}{{appName}}{{/modulized}}.Api.{{classname}} do
+  @moduledoc """
+  Documentation for {{#modulized}}{{appName}}{{/modulized}}.Api.{{classname}}.
+  """
 
-# This is a sample api mustache template.  It is representing a ficticous 
-# language and won't be usable or compile to anything without lots of changes.
-# Use it as an example.  You can access the variables in the generator object
-# like such:
+  use Tesla
 
-# use the package from the `apiPackage` variable
-package: {{package}}
-
-# operations block
+  plug Tesla.Middleware.BaseUrl, "{{basePath}}"
+  plug Tesla.Middleware.JSON
 {{#operations}}
-classname: {{classname}}
+    {{#operation}}
 
-# loop over each operation in the API:
-{{#operation}}
+  def {{#underscored}}{{operationId}}{{/underscored}}({{#allParams}}{{^-first}}, {{/-first}}{{#underscored}}{{paramName}}{{/underscored}}{{/allParams}}) do
+    method = [method: :{{#underscored}}{{httpMethod}}{{/underscored}}]
+    url = [url: "{{replacedPathName}}"]
+    query_params = [{{^queryParams.isEmpty}}query: [{{#queryParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/queryParams}}]{{/queryParams.isEmpty}}]
+    header_params = [{{^headerParams.isEmpty}}header: [{{#headerParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/headerParams}}]{{/headerParams.isEmpty}}]
+    body_params = [{{^bodyParams.isEmpty}}body: [{{#bodyParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/bodyParams}}]{{/bodyParams.isEmpty}}]
+    form_params = [{{^formParams.isEmpty}}body: [{{#formParams}}{{^-first}}, {{/-first}}{"{{paramName}}", {{#underscored}}{{paramName}}{{/underscored}}}{{/formParams}}]{{/formParams.isEmpty}}]
+    params = query_params ++ header_params ++ Keyword.get_values(body_params ++ form_params, :body)
+    opts = []
+    options = method ++ url ++ params ++ opts
 
-# each operation has an `operationId`:
-operationId: {{operationId}}
-
-# and parameters:
-{{#allParams}}
-{{paramName}}: {{dataType}}
-{{/allParams}}
-
-{{/operation}}
-
-# end of operations block
+    request(options)
+  end
+    {{/operation}}
 {{/operations}}
+end
