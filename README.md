@@ -1,3 +1,6 @@
+:warning: **This repository has been no longer maintained, due to contribute back to [Swagger Codegen](https://github.com/swagger-api/swagger-codegen). Please use it.** :warning:
+
+
 # Swagger Codegen for the ElixirClient library
 
 ## Overview
